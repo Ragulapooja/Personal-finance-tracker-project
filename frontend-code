@@ -1,0 +1,107 @@
+//setting up 
+npx create-react-app finance-tracker
+cd finance-tracker
+npm start
+a)transact
+import React, { useState } from 'react';
+
+const TransactionForm = ({ addTransaction }) => {
+  const [amount, setAmount] = useState('');
+  const [type, setType] = useState('income');
+  const [description, setDescription] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addTransaction({ description, amount: parseFloat(amount), type });
+    setAmount('');
+    setDescription('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        type="text" 
+        placeholder="Description" 
+        value={description} 
+        onChange={(e) => setDescription(e.target.value)} 
+        required 
+      />
+      <input 
+        type="number" 
+        placeholder="Amount" 
+        value={amount} 
+        onChange={(e) => setAmount(e.target.value)} 
+        required 
+      />
+      <select value={type} onChange={(e) => setType(e.target.value)}>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <button type="submit">Add Transaction</button>
+    </form>
+  );
+};
+
+export default TransactionForm;
+//transactional list
+import React from 'react';
+
+const TransactionList = ({ transactions }) => {
+  return (
+    <ul>
+      {transactions.map((t, index) => (
+        <li key={index}>
+          {t.description}: {t.type === 'income' ? '+' : '-'}${t.amount}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default TransactionList;
+//summary.js
+import React from 'react';
+
+const Summary = ({ transactions }) => {
+  const income = transactions
+    .filter(t => t.type === 'income')
+    .reduce((acc, curr) => acc + curr.amount, 0);
+  const expenses = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((acc, curr) => acc + curr.amount, 0);
+  const balance = income - expenses;
+
+  return (
+    <div>
+      <h3>Total Income: ${income}</h3>
+      <h3>Total Expenses: ${expenses}</h3>
+      <h3>Balance: ${balance}</h3>
+    </div>
+  );
+};
+
+export default Summary;
+//app.js
+import React, { useState, useEffect } from 'react';
+import TransactionForm from './TransactionForm';
+import TransactionList from './TransactionList';
+import Summary from './Summary';
+
+const App = () => {
+  const [transactions, setTransactions] = useState([]);
+
+  const addTransaction = (transaction) => {
+    setTransactions([...transactions, transaction]);
+  };
+
+  return (
+    <div>
+      <h1>Personal Finance Tracker</h1>
+      <TransactionForm addTransaction={addTransaction} />
+      <TransactionList transactions={transactions} />
+      <Summary transactions={transactions} />
+    </div>
+  );
+};
+
+export default App;
