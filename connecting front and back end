@@ -1,0 +1,18 @@
+useEffect(() => {
+  fetch('http://localhost:5000/api/transactions')
+    .then(res => res.json())
+    .then(data => setTransactions(data))
+    .catch(err => console.error(err));
+}, []);
+const addTransaction = (transaction) => {
+  fetch('http://localhost:5000/api/transactions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(transaction)
+  })
+  .then(res => res.json())
+  .then(newTransaction => setTransactions([...transactions, newTransaction]))
+  .catch(err => console.error(err));
+};
